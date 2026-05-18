@@ -1,3 +1,27 @@
 <resources>
-    <string name="app_name">Jellyfin</string>
+    <string name="app_name">CineApp</string>
+
+    <string name="home_title">Films populaires</string>
+    <string name="detail_title">Détail du film</string>
+
+    <string name="back_content_description">Retour</string>
+    <string name="poster_content_description">Affiche du film</string>
+    <string name="backdrop_content_description">Image d\'arrière-plan</string>
+
+    <string name="loading">Chargement en cours…</string>
+    <string name="error_generic">Une erreur est survenue.</string>
+    <string name="error_no_internet">Vérifie ta connexion Internet.</string>
+    <string name="error_missing_api_key">Cle API TMDB manquante. Ajoute TMDB_API_KEY dans local.properties.</string>
+    <string name="retry">Réessayer</string>
+
+    <string name="release_date_label">Date de sortie : %1$s</string>
+    <string name="rating_label">Note : %1$.1f / 10 (%2$d votes)</string>
+    <string name="runtime_label">Durée : %1$d min</string>
+    <string name="genres_label">Genres : %1$s</string>
+    <string name="tagline_label">« %1$s »</string>
+    <string name="overview_label">Synopsis</string>
+    <string name="overview_empty">Aucun synopsis disponible.</string>
+    <string name="original_title_label">Titre original : %1$s</string>
+    <string name="status_label">Statut : %1$s</string>
+    <string name="homepage_label">Site officiel</string>
 </resources>
