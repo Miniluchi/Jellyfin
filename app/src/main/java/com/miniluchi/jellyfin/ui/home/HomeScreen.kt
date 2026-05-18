@@ -4,14 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -40,6 +45,8 @@ import com.miniluchi.jellyfin.R
 import com.miniluchi.jellyfin.domain.model.Movie
 import com.miniluchi.jellyfin.ui.components.ErrorView
 import com.miniluchi.jellyfin.ui.components.LoadingView
+
+private const val GRID_COLUMNS = 2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,47 +82,70 @@ private fun MovieGrid(
     movies: List<Movie>,
     onMovieClick: (Int) -> Unit,
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 150.dp),
+    val rows = movies.chunked(GRID_COLUMNS)
+    LazyColumn(
         contentPadding = PaddingValues(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxSize(),
     ) {
-        items(items = movies, key = { it.id }) { movie ->
-            MovieCard(movie = movie, onClick = { onMovieClick(movie.id) })
+        items(items = rows, key = { row -> row.first().id }) { rowMovies ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                rowMovies.forEach { movie ->
+                    MovieCard(
+                        movie = movie,
+                        onClick = { onMovieClick(movie.id) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                    )
+                }
+                repeat(GRID_COLUMNS - rowMovies.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun MovieCard(movie: Movie, onClick: () -> Unit) {
+private fun MovieCard(
+    movie: Movie,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(2f / 3f)
-                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-        ) {
-            if (movie.posterUrl != null) {
-                AsyncImage(
-                    model = movie.posterUrl,
-                    contentDescription = stringResource(R.string.poster_content_description),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f / 3f)
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+            ) {
+                if (movie.posterUrl != null) {
+                    AsyncImage(
+                        model = movie.posterUrl,
+                        contentDescription = stringResource(R.string.poster_content_description),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
-        }
-        Box(modifier = Modifier.padding(8.dp)) {
-            androidx.compose.foundation.layout.Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = movie.title,
@@ -124,9 +154,10 @@ private fun MovieCard(movie: Movie, onClick: () -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                androidx.compose.foundation.layout.Row(
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Star,
